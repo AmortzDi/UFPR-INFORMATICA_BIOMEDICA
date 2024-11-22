@@ -70,7 +70,7 @@ void getNome(char nome[]) {
 }
 
 // a função a seguir deve retornar o seu número de GRR
-uint32_t getGRR() { return 20213396; }
+uint32_t getGRR() { return 5466; }
 
 // Função para mesclar dois subvetores ordenados
 void merge(int vetor[], int a, int meio, int b, uint64_t *numComparacoes) {
