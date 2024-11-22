@@ -15,7 +15,7 @@ void getNome(char nome[]) {
         '\0';  // adicionada terminação manual para caso de overflow
 }
 // a função a seguir deve retornar o seu número de GRR
-uint32_t getGRR() { return 20213396; }
+uint32_t getGRR() { return 454; }
 
 void troca(int vetor[], int indice_1, int indice_2) {
     int temp = vetor[indice_1];
