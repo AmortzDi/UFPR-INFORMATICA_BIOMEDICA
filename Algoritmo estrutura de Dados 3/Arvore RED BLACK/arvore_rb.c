@@ -2,9 +2,6 @@
 #include <stdlib.h>
 #include "arvore_rb.h"
 
-#define VERMELHO 1
-#define PRETO 0
-
 
 // Função para imprimir a árvore com nível, cor e valores
 void imprimir_arvore_aux(struct no *n, int nivel) {
@@ -50,18 +47,25 @@ void destroi_arvore(struct arvore *t) {
     // Depois de destruir todos os nós, zera a árvore
     t->raiz = NULL;
 }
+void destruir_no(struct no **n) {
+    if (n == NULL || *n == NULL) {
+        return;
+    }
+
+    // Libera o nó e define o ponteiro como NULL
+    free(*n);
+    *n = NULL;
+}
 
 
 // Funções de rotação (esquerda e direita)
 void rotacao_esq(struct arvore *t, struct no *x) {
     struct no *y = x->direito;
     x->direito = y->esquerdo;
-
     if (y->esquerdo != NULL) {
         y->esquerdo->pai = x;
     }
     y->pai = x->pai;
-
     if (x->pai == NULL) {
         t->raiz = y;
     } else if (x == x->pai->esquerdo) {
@@ -69,10 +73,10 @@ void rotacao_esq(struct arvore *t, struct no *x) {
     } else {
         x->pai->direito = y;
     }
-
     y->esquerdo = x;
     x->pai = y;
 }
+
 
 void rotacao_dir(struct arvore *t, struct no *x) {
     struct no *y = x->esquerdo;
@@ -113,39 +117,6 @@ struct no* inicializar_no(int n) {
 
     return novo;
 }
-
-// Função para inserir um nó na árvore Rubro-Negra
-void rb_insere(struct arvore *t, struct no *z) {
-    struct no *y = NULL;        // Nó auxiliar para rastrear o pai
-    struct no *x = t->raiz;     // Começa pela raiz da árvore
-
-    // Procura o local correto para inserir o nó z
-    while (x != NULL) {
-        y = x;
-        if (z->valor < x->valor) // Caminha para a subárvore esquerda
-            x = x->esquerdo;
-        else                     // Caminha para a subárvore direita
-            x = x->direito;
-    }
-
-    // Define o pai do nó z
-    z->pai = y;
-    if (y == NULL)              // Se a árvore estiver vazia
-        t->raiz = z;
-    else if (z->valor < y->valor) // Insere à esquerda
-        y->esquerdo = z;
-    else                        // Insere à direita
-        y->direito = z;
-
-    // Inicializa os ponteiros dos filhos e a cor do nó z
-    z->esquerdo = NULL;
-    z->direito = NULL;
-    z->cor = VERMELHO;
-
-    // Ajusta a árvore após a inserção para manter as propriedades da RB
-    rb_insere_fixup(t, z);
-}
-
 // Função para corrigir a árvore após inserção
 void rb_insere_fixup(struct arvore *t, struct no *z) {
     while (z->pai != NULL && z->pai->cor == VERMELHO) { // Enquanto o pai for vermelho
@@ -192,6 +163,40 @@ void rb_insere_fixup(struct arvore *t, struct no *z) {
     t->raiz->cor = PRETO;
 }
 
+
+// Função para inserir um nó na árvore Rubro-Negra
+void rb_insere(struct arvore *t, struct no *z) {
+    struct no *y = NULL;        // Nó auxiliar para rastrear o pai
+    struct no *x = t->raiz;     // Começa pela raiz da árvore
+
+    // Procura o local correto para inserir o nó z
+    while (x != NULL) {
+        y = x;
+        if (z->valor < x->valor) // Caminha para a subárvore esquerda
+            x = x->esquerdo;
+        else                     // Caminha para a subárvore direita
+            x = x->direito;
+    }
+
+    // Define o pai do nó z
+    z->pai = y;
+    if (y == NULL)              // Se a árvore estiver vazia
+        t->raiz = z;
+    else if (z->valor < y->valor) // Insere à esquerda
+        y->esquerdo = z;
+    else                        // Insere à direita
+        y->direito = z;
+
+    // Inicializa os ponteiros dos filhos e a cor do nó z
+    z->esquerdo = NULL;
+    z->direito = NULL;
+    z->cor = VERMELHO;
+
+    // Ajusta a árvore após a inserção para manter as propriedades da RB
+    rb_insere_fixup(t, z);
+}
+
+
 // Função para inserir um elemento na árvore
 void insere_elemento(struct arvore *t, int x) {
     struct no* z = inicializar_no(x); // Inicializa o nó
@@ -228,68 +233,92 @@ void rb_transplante(struct arvore *t, struct no *u, struct no *v) {
     }
 }
 void rb_delete_fixup(struct arvore *t, struct no *x) {
-    while (x != t->raiz && x->cor == PRETO) {
+    // Enquanto x não for a raiz e sua cor for preta
+    while (x != t->raiz && x != NULL && x->cor == PRETO) {
+        
+        // Caso 1: x é filho esquerdo de seu pai
         if (x == x->pai->esquerdo) {
-            struct no *w = x->pai->direito;
-            // Se o irmão de x é vermelho, faça uma rotação à esquerda
+            struct no *w = x->pai->direito; // w é o irmão de x
+
+            // Caso 1a: Se o irmão w for vermelho, rotaciona à esquerda no pai de x
             if (w->cor == VERMELHO) {
                 w->cor = PRETO;
                 x->pai->cor = VERMELHO;
-                rotacao_esq(t, x->pai);
-                w = x->pai->direito;
+                rotacao_esq(t, x->pai); // Rotação à esquerda
+                w = x->pai->direito;    // Atualiza w após a rotação
             }
 
-            // Se ambos os filhos de w são pretos, pinte w de vermelho
-            if (w->esquerdo->cor == PRETO && w->direito->cor == PRETO) {
+            // Caso 1b: Se ambos os filhos de w são pretos ou nulos, pinte w de vermelho
+            if ((w->esquerdo == NULL || w->esquerdo->cor == PRETO) &&
+                (w->direito == NULL || w->direito->cor == PRETO)) {
                 w->cor = VERMELHO;
-                x = x->pai;
+                x = x->pai; // Sobe para o pai
             } else {
-                if (w->direito->cor == PRETO) {
-                    w->esquerdo->cor = PRETO;
+                // Caso 1c: Se o filho direito de w é preto, rotaciona à direita em w
+                if (w->direito == NULL || w->direito->cor == PRETO) {
+                    if (w->esquerdo != NULL) {
+                        w->esquerdo->cor = PRETO;
+                    }
                     w->cor = VERMELHO;
-                    rotacao_dir(t, w);
-                    w = x->pai->direito;
+                    rotacao_dir(t, w); // Rotação à direita
+                    w = x->pai->direito; // Atualiza w após a rotação
                 }
 
+                // Caso 1d: Ajusta cores e faz rotação à esquerda
                 w->cor = x->pai->cor;
                 x->pai->cor = PRETO;
-                w->direito->cor = PRETO;
-                rotacao_esq(t, x->pai);
-                x = t->raiz;
-            }
-        } else {
-            struct no *w = x->pai->esquerdo;
-
-            if (w->cor == VERMELHO) {
-                w->cor = PRETO;
-                x->pai->cor = VERMELHO;
-                rotacao_dir(t, x->pai);
-                w = x->pai->esquerdo;
-            }
-
-            if (w->direito->cor == PRETO && w->esquerdo->cor == PRETO) {
-                w->cor = VERMELHO;
-                x = x->pai;
-            } else {
-                if (w->esquerdo->cor == PRETO) {
+                if (w->direito != NULL) {
                     w->direito->cor = PRETO;
+                }
+                rotacao_esq(t, x->pai); // Rotação à esquerda
+                x = t->raiz; // Termina a correção
+            }
+        } else { // Caso 2: x é filho direito de seu pai
+            struct no *w = x->pai->esquerdo; // w é o irmão de x
+
+            // Caso 2a: Se o irmão w for vermelho, rotaciona à direita no pai de x
+            if (w->cor == VERMELHO) {
+                w->cor = PRETO;
+                x->pai->cor = VERMELHO;
+                rotacao_dir(t, x->pai); // Rotação à direita
+                w = x->pai->esquerdo;   // Atualiza w após a rotação
+            }
+
+            // Caso 2b: Se ambos os filhos de w são pretos ou nulos, pinte w de vermelho
+            if ((w->direito == NULL || w->direito->cor == PRETO) &&
+                (w->esquerdo == NULL || w->esquerdo->cor == PRETO)) {
+                w->cor = VERMELHO;
+                x = x->pai; // Sobe para o pai
+            } else {
+                // Caso 2c: Se o filho esquerdo de w é preto, rotaciona à esquerda em w
+                if (w->esquerdo == NULL || w->esquerdo->cor == PRETO) {
+                    if (w->direito != NULL) {
+                        w->direito->cor = PRETO;
+                    }
                     w->cor = VERMELHO;
-                    rotacao_esq(t, w);
-                    w = x->pai->esquerdo;
+                    rotacao_esq(t, w); // Rotação à esquerda
+                    w = x->pai->esquerdo; // Atualiza w após a rotação
                 }
 
+                // Caso 2d: Ajusta cores e faz rotação à direita
                 w->cor = x->pai->cor;
                 x->pai->cor = PRETO;
-                w->esquerdo->cor = PRETO;
-                rotacao_dir(t, x->pai);
-                x = t->raiz;
+                if (w->esquerdo != NULL) {
+                    w->esquerdo->cor = PRETO;
+                }
+                rotacao_dir(t, x->pai); // Rotação à direita
+                x = t->raiz; // Termina a correção
             }
         }
     }
 
-        x->cor = PRETO; // Garante que a raiz seja preta
-    
+    // Garante que x (pode ser nulo) tenha a cor preta após a correção
+    if (x != NULL) {
+        x->cor = PRETO;
+    }
 }
+
+
 // Função para excluir um nó da árvore rubro-negra
 void rb_delete(struct arvore *t, struct no *z) {
     struct no *y = z; // Nó que será realmente removido ou movido
@@ -303,8 +332,7 @@ void rb_delete(struct arvore *t, struct no *z) {
         x = z->esquerdo; // Substituto é o filho esquerdo
         rb_transplante(t, z, z->esquerdo);
     } else {
-        // Encontra o menor elemento na subárvore direita
-        y = menor_elemento(z->direito);
+        y = menor_elemento(z->direito);  // Encontra o menor elemento na subárvore direita
         y_cor_original = y->cor; // Salva a cor original de y
         x = y->direito;
 
@@ -343,12 +371,8 @@ struct no* buscar_no(struct arvore *t, int valor) {
 // Função para remover um valor da árvore
 void remover_elemento(struct arvore *t, int valor) {
     struct no *no_remover = buscar_no(t, valor);
-    if (no_remover != NULL) {
+    if (no_remover != NULL) 
         rb_delete(t, no_remover);
-        printf("Valor %d removido com sucesso!\n", valor);
-    } else {
-        printf("Valor %d não encontrado na árvore.\n", valor);
-    }
 }
 
 
