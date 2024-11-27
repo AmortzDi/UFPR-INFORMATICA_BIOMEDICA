@@ -22,12 +22,10 @@ int main() {
         
             if (no_remover != NULL) {
                 rb_delete(&t, no_remover);  // Remove um elemento
-                printf("Valor %d removido com sucesso!\n", chave);
-            } else {
-                printf("Valor %d não encontrado na árvore.\n", chave);
-            }
+                destruir_no(&no_remover);
+            } else
+                    return -1;
         } else {
-            printf("Comando inválido\n");
             return -1;
         }
     }
