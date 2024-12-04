@@ -336,7 +336,9 @@ void rb_delete(struct arvore *t, struct no *z) {
         y_cor_original = y->cor; // Salva a cor original de y
         x = y->direito;
 
-        if (y->pai != z) {
+        if (y->pai == z) {
+            if (x) x->pai = y;
+        } else {
             rb_transplante(t, y, y->direito);
             y->direito = z->direito;
             y->direito->pai = y;
