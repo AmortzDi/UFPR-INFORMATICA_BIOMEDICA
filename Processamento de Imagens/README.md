@@ -26,7 +26,7 @@ Este projeto consiste em um conjunto de scripts para analisar o desempenho do mo
 ---
 
 ## 🚀 Exemplo de Execução
-```bash
+```
 # 1. Garanta que os arquivos de dados estão no diretório:
 ls *.txt
 # Exemplo: 512_yolov4_100_dados_celulas.txt  1024_yolov4_100_dados_celulas.txt
