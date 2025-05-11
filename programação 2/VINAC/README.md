@@ -1,6 +1,3 @@
-# Aluno: **Mozart Gustavo da Cruz Dias** 
-# GRR: **20213396**
-
 # 📦 Vinac Archive Manager
 
 ## 🔍 Visão Geral
