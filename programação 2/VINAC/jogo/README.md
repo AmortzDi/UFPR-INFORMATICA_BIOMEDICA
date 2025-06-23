@@ -1,5 +1,4 @@
-# Aluno: Mozart Dias 
-# GRR:20213396
+
 # Projeto TERONA - Um Jogo de Plataforma com Allegro 5
 
 Este projeto é um jogo de plataforma 2D desenvolvido em C utilizando a biblioteca Allegro 5. O jogo apresenta um personagem jogável, plataformas, objetos móveis, inimigos (vilões), um sistema de vida, coleta de itens, diálogos e uma batalha contra um chefe.
