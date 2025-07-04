@@ -1,5 +1,4 @@
-# Aluno: **Mozart Gustavo da Cruz Dias** 
-# GRR: **20213396**
+
 
 # 🩻 Classificador de Imagens DICOM – Pneumotórax vs. Normal
 
