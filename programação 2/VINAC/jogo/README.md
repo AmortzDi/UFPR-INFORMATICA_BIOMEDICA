@@ -75,9 +75,9 @@ Para compilar e rodar este jogo, você precisará ter o Allegro 5 instalado em s
 
 Após a compilação bem-sucedida, execute o jogo:
 
+OBS:
+O arquivo MGCD21 ele foi realizado alteração do boss onde ele consegue "empurrar" o personagem para fora da plataforma, foi solicitado essa alteração pelo o professor durando aprensetação do trabalho.
+
 ```bash
 ./terona
 
-
-OBS:
-O arquivo MGCD21 ele foi realizado alteração do boss onde ele consegue "empurrar" o personagem para fora da plataforma, foi solicitado essa alteração pelo o professor durando aprensetação do trabalho.
